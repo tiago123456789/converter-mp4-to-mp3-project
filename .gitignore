@@ -1,1 +1,3 @@
 infra/auth/secret.yml
+gateway/node_modules
+gateway/.env

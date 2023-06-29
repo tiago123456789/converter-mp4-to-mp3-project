@@ -1,0 +1,19 @@
+[
+    {
+        "path": "/auth",
+        "proxyOptions": {
+            "target": "http://127.0.0.1:3000",
+            "secure": false
+        }
+    },
+    {
+        "path": "/teste",
+        "enableAuthorization": true,
+        "customFunction": "testCommand"
+    },
+    {
+        "path": "/teste-open",
+        "enableAuthorization": false,
+        "customFunction": "testCommand"
+    }
+]
