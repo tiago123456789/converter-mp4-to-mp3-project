@@ -3,26 +3,17 @@ const express = require("express")
 const { createProxyMiddleware } = require("http-proxy-middleware")
 const app = express();
 
-const routes = require("../routes.json")
-const command = require("./commands")
 const ensureAuthenticated = require("./middlewares/ensure-authenticated.middleware")
+const authServiceProxy = createProxyMiddleware({
+    "target": process.env.AUTH_SERVICE,
+    "secure": false
+})
+const converterServiceProxy = createProxyMiddleware({
+    "target": process.env.CONVERTER_SERVICE,
+    "secure": false
+})
 
-for (let index = 0; index < routes.length; index += 1) {
-    const route = routes[index]
-    let handler;
-
-    if (route.proxyOptions) {
-        handler = createProxyMiddleware(route.proxyOptions)
-    } else if (route.customFunction) {
-        handler = command[route.customFunction]
-    }
-
-    if (route.enableAuthorization) {
-        app.use(route.path, ensureAuthenticated, handler)
-        continue;
-    }
-
-    app.use(route.path, handler)
-}
+app.use("/auth", authServiceProxy);
+app.use("/files", ensureAuthenticated, converterServiceProxy)
 
 app.listen(3001, () => console.log("Server is runnint at http://localhost:3001"))
