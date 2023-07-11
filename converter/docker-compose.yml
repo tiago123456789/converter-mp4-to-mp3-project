@@ -2,6 +2,16 @@ version: "3"
 
 services:
 
+  converter:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - 3002:3002
+    env_file:
+      - .env
+    container_name: app_converter
+
   mongo:
     image: mongo
     restart: always

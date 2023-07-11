@@ -4,10 +4,11 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MulterModule } from '@nestjs/platform-express';
 import { GridFsMulterConfigService } from './gridfs-multer-config.service';
-import { BullModule } from '@nestjs/bull';
+import { BullModule, BullModuleOptions } from '@nestjs/bull';
 import { AppConsumer } from './app.consumer';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
+console.log(process.env.QUEUE_CONVERT_MP4_TO_MP3);
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -28,11 +29,7 @@ import { ConfigModule } from '@nestjs/config';
       },
     }),
     BullModule.registerQueueAsync({
-      useFactory() {
-        return {
-          name: process.env.QUEUE_CONVERT_MP4_TO_MP3,
-        };
-      },
+      name: process.env.QUEUE_CONVERT_MP4_TO_MP3,
     }),
   ],
   controllers: [AppController],

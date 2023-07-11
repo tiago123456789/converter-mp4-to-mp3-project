@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+
+  gateway:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - 3001:3001
+    env_file:
+      - .env
+    container_name: app_gateway
