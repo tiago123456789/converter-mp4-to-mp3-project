@@ -1,3 +1,5 @@
 infra/auth/secret.yml
+infra/converter/app-secret.yml
+
 gateway/node_modules
 gateway/.env

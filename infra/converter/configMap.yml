@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: converter-configmap
+data:
+  REDIS_HOST: 'redis'
+  REDIS_PORT: '6379'
+  QUEUE_CONVERT_MP4_TO_MP3: convert_mp4_to_mp3
