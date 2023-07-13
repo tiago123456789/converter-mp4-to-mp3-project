@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-configmap
+data:
+  URL_AUTH_VALID_TOKEN: 'http://auth:3000/auth/is-valid'
+  AUTH_SERVICE: 'http://auth:3000'
+  CONVERTER_SERVICE: 'http://converter:3002'
