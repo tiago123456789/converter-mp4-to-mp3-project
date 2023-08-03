@@ -4,3 +4,12 @@ infra/converter/app-secret.yml
 
 gateway/node_modules
 gateway/.env
+
+auth/.env
+auth/node_modules/
+
+converter/.env
+converter/node_modules/
+
+notification/.env
+notification/node_modules/

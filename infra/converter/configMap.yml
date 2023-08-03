@@ -6,3 +6,5 @@ data:
   REDIS_HOST: 'redis'
   REDIS_PORT: '6379'
   QUEUE_CONVERT_MP4_TO_MP3: convert_mp4_to_mp3
+  QUEUE_CONVERTION_COMPLETE: 'convertion_complete'
+  LINK_FILE: mp3converter.com/files/

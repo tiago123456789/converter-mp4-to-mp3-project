@@ -4,23 +4,30 @@ import {
   HttpCode,
   Param,
   Post,
+  Req,
   Res,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { AppService } from './app.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
+import { ConverterService } from './converter.service';
+import { ExtractUserInterceptor } from 'src/common/interceptors/extract-user.interceptor';
+import { IRequestWithUser } from 'src/common/types/irequest-with-user';
 
 @Controller('/files')
-export class AppController {
-  constructor(private readonly appService: AppService) {}
+export class ConverterController {
+  constructor(private readonly converterService: ConverterService) {}
 
   @Post('/')
   @HttpCode(201)
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file) {
-    await this.appService.convertMp4ToMp3(file);
+  @UseInterceptors(ExtractUserInterceptor)
+  async uploadFile(@UploadedFile() file, @Req() request: IRequestWithUser) {
+    await this.converterService.save({
+      id: file.id,
+      user: request.user,
+    });
     return {
       originalname: file.originalname,
       encoding: file.encoding,
@@ -39,8 +46,8 @@ export class AppController {
 
   @Get(':id')
   async getFileById(@Param('id') id: string, @Res() response: Response) {
-    const file = await this.appService.findInfo(id);
-    const filestream = await this.appService.readStream(id);
+    const file = await this.converterService.findInfo(id);
+    const filestream = await this.converterService.readStream(id);
     response.header('Content-Type', file.contentType);
     return filestream.pipe(response);
   }

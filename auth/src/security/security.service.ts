@@ -40,6 +40,7 @@ export class SecurityService {
 
     const accessToken = await this.authToken.get({
       id: userWithEmail.id,
+      email: userWithEmail.email,
     });
 
     return { accessToken };
