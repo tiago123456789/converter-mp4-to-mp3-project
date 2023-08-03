@@ -14,6 +14,7 @@ import { Response } from 'express';
 import { ConverterService } from './converter.service';
 import { ExtractUserInterceptor } from 'src/common/interceptors/extract-user.interceptor';
 import { IRequestWithUser } from 'src/common/types/irequest-with-user';
+import { Mp3ConverterDto } from './mp3-converted.dto';
 
 @Controller('/files')
 export class ConverterController {
@@ -42,6 +43,15 @@ export class ConverterController {
       uploadDate: file.uploadDate,
       contentType: file.contentType,
     };
+  }
+
+  @Get('/mp3-converted')
+  @HttpCode(200)
+  @UseInterceptors(ExtractUserInterceptor)
+  async getMp3ConvertedByUserId(
+    @Req() request: IRequestWithUser,
+  ): Promise<Mp3ConverterDto[]> {
+    return this.converterService.getMp3ConvertedByUserId(request.user.id);
   }
 
   @Get(':id')

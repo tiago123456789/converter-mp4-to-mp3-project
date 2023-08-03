@@ -1,9 +1,9 @@
 import { InjectQueue } from '@nestjs/bull';
 import { HttpException, Injectable } from '@nestjs/common';
-import { InjectConnection } from '@nestjs/mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Queue } from 'bull';
 import { MongoGridFS } from 'mongo-gridfs';
-import { Connection } from 'mongoose';
+import { Connection, Model } from 'mongoose';
 import { GridFSBucketReadStream } from 'mongodb';
 import { FileInfoDto } from './file-info.dto';
 import * as path from 'path';
@@ -11,7 +11,9 @@ import * as fs from 'fs';
 import * as converter from 'video-converter';
 import { NewFileConverterMessage } from 'src/common/queue/messages/new-file-converter.message';
 import { ConvertionSuccessMessage } from 'src/common/queue/messages/convertion-success.message';
-import { IUser } from 'src/common/types/irequest-with-user';
+import { MP3_CONVERTER_SCHEMA } from 'src/common/constants/mongoose';
+import { Mp3Converter, Mp3ConverterDocument } from './mp3-converter.schema';
+import { Mp3ConverterDto } from './mp3-converted.dto';
 
 @Injectable()
 export class ConverterService {
@@ -23,6 +25,8 @@ export class ConverterService {
     @InjectQueue('convertion_complete')
     private readonly convertionCompleteQueue: Queue<ConvertionSuccessMessage>,
     @InjectConnection() private readonly connection: Connection,
+    @InjectModel(MP3_CONVERTER_SCHEMA)
+    private readonly mp3ConverterModel: Model<Mp3Converter>,
   ) {
     // @ts-ignore
     this.fileModel = new MongoGridFS(this.connection.db, 'fs');
@@ -50,6 +54,22 @@ export class ConverterService {
 
   save(file: NewFileConverterMessage) {
     return this.convertMp4ToMp3Queue.add(file);
+  }
+
+  async getMp3ConvertedByUserId(userId: number): Promise<Mp3ConverterDto[]> {
+    const registers: Mp3ConverterDocument[] = await this.mp3ConverterModel
+      .find({
+        userId,
+      })
+      .exec();
+
+    return registers.map((item: Mp3ConverterDocument) => {
+      const mp3ConvertedDto = new Mp3ConverterDto();
+      mp3ConvertedDto.userId = userId;
+      mp3ConvertedDto.link = `${process.env.LINK_FILE}${item.fileId}`;
+      mp3ConvertedDto.createdAt = item.createdAt;
+      return mp3ConvertedDto;
+    });
   }
 
   async convertMp4ToMp3(message: NewFileConverterMessage) {
@@ -108,6 +128,13 @@ export class ConverterService {
             readMp3Stream,
             options,
           );
+          await this.mp3ConverterModel.insertMany([
+            {
+              userId: message.user.id,
+              fileId: mp3Created._id,
+              createdAt: new Date(),
+            },
+          ]);
           console.log(`Saved ${pathOutputMp3} file in mongodb`);
           console.log(
             `Completed process to convert ${pathFileToProcess} to ${pathOutputMp3}`,
