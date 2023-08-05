@@ -14,6 +14,8 @@ const converterServiceProxy = createProxyMiddleware({
 })
 
 app.use("/auth", authServiceProxy);
+app.use("/files/:id", converterServiceProxy)
 app.use("/files", ensureAuthenticated, converterServiceProxy)
+
 
 app.listen(3001, () => console.log("Server is running at http://localhost:3001"))
