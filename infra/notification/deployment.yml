@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notification
+  labels:
+    app: notification
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notification
+  template:
+    metadata:
+      labels:
+        app: notification
+    spec:
+      containers:
+      - name: notification
+        image: tiagorosadacosta123456/notification_course_microservice:latest
+        envFrom:
+        - configMapRef:
+            name: notification-configmap
+        - secretRef:
+            name: notification-secret
