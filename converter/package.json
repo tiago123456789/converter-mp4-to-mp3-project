@@ -20,6 +20,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@aws-sdk/client-cloudwatch-logs": "^3.385.0",
     "@nestjs/bull": "^10.0.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.0.0",
@@ -27,13 +28,18 @@
     "@nestjs/event-emitter": "^2.0.0",
     "@nestjs/mongoose": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
+    "aws-sdk": "^2.1430.0",
     "bull": "^4.10.4",
+    "cls-rtracer": "^2.6.3",
     "mongodb": "^4.16.0",
     "mongoose": "^6.11.2",
     "multer-gridfs-storage": "^5.0.2",
+    "nest-winston": "^1.9.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "video-converter": "^1.0.0"
+    "video-converter": "^1.0.0",
+    "winston": "^3.10.0",
+    "winston-cloudwatch": "^6.2.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

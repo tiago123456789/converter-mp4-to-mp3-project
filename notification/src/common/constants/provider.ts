@@ -1,1 +1,2 @@
 export const EMAIL_PROVIDER = 'EMAIL_PROVIDER';
+export const LOGGER_PROVIDER = 'LOGGER_PROVIDER';

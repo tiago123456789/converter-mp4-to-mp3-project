@@ -4,9 +4,10 @@ import { ConfigService } from '@nestjs/config';
 import { NotificationConsumer } from './notification.consumer';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EMAIL_PROVIDER } from 'src/common/constants/provider';
-import { NestMailerAdapter } from './adapters/nest-mailer.adapter';
+import { NestMailerAdapter } from '../common/adapters/nest-mailer.adapter';
 import { NotificationService } from './notification.service';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
+import { CommonModule } from 'src/common/common.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
         };
       },
     }),
+    CommonModule,
   ],
   providers: [
     NotificationConsumer,
