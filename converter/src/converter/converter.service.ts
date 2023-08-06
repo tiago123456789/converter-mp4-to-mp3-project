@@ -1,7 +1,5 @@
-import { InjectQueue } from '@nestjs/bull';
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Queue } from 'bull';
 import { MongoGridFS } from 'mongo-gridfs';
 import { Connection, Model } from 'mongoose';
 import { GridFSBucketReadStream } from 'mongodb';
@@ -14,8 +12,6 @@ import { ConvertionSuccessMessage } from 'src/common/queue/messages/convertion-s
 import { MP3_CONVERTER_SCHEMA } from 'src/common/constants/mongoose';
 import { Mp3Converter, Mp3ConverterDocument } from './mp3-converter.schema';
 import { Mp3ConverterDto } from './mp3-converted.dto';
-import { Logger } from 'winston';
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import {
   CONVERTION_SUCCESS_QUEUE_PUBLISHER_ADAPTER,
   LOGGER_PROVIDER,
@@ -24,6 +20,7 @@ import {
 } from 'src/common/constants/provider';
 import { TrackerIdInterface } from 'src/common/adapters/tracker-id.interface';
 import { QueuePublisher } from 'src/common/adapters/queue/queue-publisher';
+import { Types } from 'mongoose';
 
 @Injectable()
 export class ConverterService {
@@ -49,13 +46,15 @@ export class ConverterService {
   }
 
   async findInfo(id: string): Promise<FileInfoDto> {
-    const results = await this.fileModel.find({ _id: id });
-    const result = results[0] || null;
+    const results = await this.fileModel.find({
+      _id: new Types.ObjectId(id),
+    });
 
-    if (!result) {
+    if (results.length === 0) {
       throw new HttpException('File not found', 404);
     }
 
+    const result = results[0] || null;
     return {
       filename: result.filename,
       length: result.length,
@@ -86,8 +85,45 @@ export class ConverterService {
     });
   }
 
+  async removeMp3ConvertedAfter30Days() {
+    const trackId = this.tracker.id();
+    try {
+      this.logger.info(
+        `Starting process to delete all mp3 files converted after 30 days`,
+        {
+          trackId: trackId,
+        },
+      );
+      const date = new Date();
+      date.setMonth(date.getMonth() - 1);
+      this.logger.info(`Deleting mp3 files converted after 30 days`, {
+        trackId: trackId,
+      });
+      await this.mp3ConverterModel.deleteMany({
+        createdAt: {
+          $lt: date.toISOString(),
+        },
+      });
+      this.logger.info(`Deleted mp3 files converted after 30 days`, {
+        trackId: trackId,
+      });
+
+      this.logger.info(
+        `Finished process to delete all mp3 files converted after 30 days`,
+        {
+          trackId: trackId,
+        },
+      );
+    } catch (error) {
+      this.logger.info(error, {
+        trackId: trackId,
+      });
+    }
+  }
+
   async convertMp4ToMp3(message: NewFileConverterMessage) {
     try {
+      console.log(`id => ${message.id}`);
       await new Promise(async (resolve, reject) => {
         try {
           this.logger.info(`Checking if exists file ${message.id}`, {

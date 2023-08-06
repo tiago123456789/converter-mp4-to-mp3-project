@@ -29,6 +29,7 @@ export class ConverterController {
       id: file.id,
       user: request.user,
     });
+    console.log(`id messages => ${file.id}`);
     return {
       originalname: file.originalname,
       encoding: file.encoding,

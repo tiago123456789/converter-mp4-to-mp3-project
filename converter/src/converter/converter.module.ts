@@ -9,6 +9,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Mp3ConverterSchema } from './mp3-converter.schema';
 import { MP3_CONVERTER_SCHEMA } from 'src/common/constants/mongoose';
 import { CommonModule } from 'src/common/common.module';
+import { ConverterSchedule } from './converter.scheduler';
 
 @Module({
   imports: [
@@ -21,7 +22,12 @@ import { CommonModule } from 'src/common/common.module';
     CommonModule,
   ],
   controllers: [ConverterController],
-  providers: [GridFsMulterConfigService, ConverterService, ConverterConsumer],
+  providers: [
+    GridFsMulterConfigService,
+    ConverterService,
+    ConverterConsumer,
+    ConverterSchedule,
+  ],
   exports: [],
 })
 export class ConverterModule {}

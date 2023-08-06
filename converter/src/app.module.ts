@@ -7,6 +7,7 @@ import * as winston from 'winston';
 import * as WinstonCloudWatch from 'winston-cloudwatch';
 
 import * as AWS from 'aws-sdk';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import * as AWS from 'aws-sdk';
         };
       },
     }),
+    ScheduleModule.forRoot(),
   ],
   controllers: [],
   providers: [],
