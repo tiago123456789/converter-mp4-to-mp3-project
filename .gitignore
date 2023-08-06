@@ -1,5 +1,7 @@
 infra/auth/secret.yml
 infra/gateway/secret.yml
+infra/notification/secret.yml
+
 infra/converter/app-secret.yml
 
 gateway/node_modules
