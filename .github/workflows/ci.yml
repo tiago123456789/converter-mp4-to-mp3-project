@@ -1,0 +1,74 @@
+name: "Pipeline ci to all services"
+on:
+  pull_request:
+    branches:
+    - "master"
+    - "develop"
+
+jobs:
+  pipeline-ci-auth:
+    runs-on: "ubuntu-latest"
+    steps:
+    - name: "Clone repository"
+      uses: actions/checkout@v2
+
+    - name: "Setup node.js"
+      uses: "actions/setup-node@v2"
+
+    - name: "Install packages"
+      run: "cd auth && npm i"
+
+    - name: "Execute unit tests"
+      run: "cd auth && npm run test"
+
+    - name: "Notify via Discord"
+      uses: Ilshidur/action-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      with:
+        args: 'The unit tests the **auth** service is ${{ job.status }}.'
+
+  pipeline-ci-converter:
+    runs-on: "ubuntu-latest"
+    steps:
+    - name: "Clone repository"
+      uses: actions/checkout@v2
+
+    - name: "Setup node.js"
+      uses: "actions/setup-node@v2"
+
+    - name: "Install packages"
+      run: "cd converter && npm i"
+
+    - name: "Execute unit tests"
+      run: "cd converter && npm run test"
+
+    - name: "Notify via Discord"
+      uses: Ilshidur/action-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      with:
+        args: 'The unit tests the **converter** service is ${{ job.status }}.'
+
+  pipeline-ci-notification:
+    runs-on: "ubuntu-latest"
+    steps:
+    - name: "Clone repository"
+      uses: actions/checkout@v2
+
+    - name: "Setup node.js"
+      uses: "actions/setup-node@v2"
+
+    - name: "Install packages"
+      run: "cd notification && npm i"
+
+    - name: "Execute unit tests"
+      run: "cd notification && npm run test"
+
+    - name: "Notify via Discord"
+      uses: Ilshidur/action-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      with:
+        args: 'The unit tests the **notification** service is ${{ job.status }}.'
+
