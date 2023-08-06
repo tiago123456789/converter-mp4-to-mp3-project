@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { NotificationModule } from './notification/notification.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as winston from 'winston';
@@ -55,7 +53,7 @@ import { CommonModule } from './common/common.module';
     }),
     CommonModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
