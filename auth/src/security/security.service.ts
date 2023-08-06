@@ -1,17 +1,18 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
 import { CredentialDto } from './dtos/credential.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { Repository } from 'typeorm';
-import { PROVIDER } from 'src/common/configs/provider';
-import { EncrypterInterface } from 'src/common/adapters/encrypter.interface';
-import { TokenInterface } from 'src/common/adapters/token.interface';
+import { PROVIDER } from './../common/configs/provider';
+import { EncrypterInterface } from './../common/adapters/encrypter.interface';
+import { TokenInterface } from './../common/adapters/token.interface';
 import { AuthenticationSuccessResponse } from './dtos/AuthenticationSuccessResponse';
+import { USER_REPOSITORY_PROVIDER } from './../common/constants/provider';
+import { UserRepositoryInterface } from './repositories/user-respository.interface';
 
 @Injectable()
 export class SecurityService {
   constructor(
-    @InjectRepository(User) private repository: Repository<User>,
+    @Inject(USER_REPOSITORY_PROVIDER)
+    private repository: UserRepositoryInterface<User>,
     @Inject(PROVIDER.ENCRYPTER) private encrypter: EncrypterInterface,
     @Inject(PROVIDER.AUTH_TOKEN) private authToken: TokenInterface,
   ) {}
@@ -19,11 +20,7 @@ export class SecurityService {
   async login(
     credential: CredentialDto,
   ): Promise<AuthenticationSuccessResponse> {
-    const userWithEmail = await this.repository.findOne({
-      where: {
-        email: credential.email,
-      },
-    });
+    const userWithEmail = await this.repository.findByEmail(credential.email);
 
     if (!userWithEmail) {
       throw new HttpException('Credentials invalid!', 401);
