@@ -1,60 +1,53 @@
 import { HttpException, Inject, Injectable } from '@nestjs/common';
-import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { MongoGridFS } from 'mongo-gridfs';
-import { Connection, Model } from 'mongoose';
+import { IGridFSObject } from 'mongo-gridfs';
 import { GridFSBucketReadStream } from 'mongodb';
 import { FileInfoDto } from './file-info.dto';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as converter from 'video-converter';
-import { NewFileConverterMessage } from 'src/common/queue/messages/new-file-converter.message';
-import { ConvertionSuccessMessage } from 'src/common/queue/messages/convertion-success.message';
-import { MP3_CONVERTER_SCHEMA } from 'src/common/constants/mongoose';
-import { Mp3Converter, Mp3ConverterDocument } from './mp3-converter.schema';
+import { NewFileConverterMessage } from './../common/queue/messages/new-file-converter.message';
+import { ConvertionSuccessMessage } from './../common/queue/messages/convertion-success.message';
+import { Mp3ConverterDocument } from './mp3-converter.schema';
 import { Mp3ConverterDto } from './mp3-converted.dto';
 import {
   CONVERTION_SUCCESS_QUEUE_PUBLISHER_ADAPTER,
+  FILE_REPOSITORY_PROVIDER,
   LOGGER_PROVIDER,
+  MP3_CONVERTER_REPOSITORY_PROVIDER,
   NEW_FILE_CONVERTER_QUEUE_PUBLISHER_PROVIDER,
   TRACKER_ID_PROVIDER,
-} from 'src/common/constants/provider';
-import { TrackerIdInterface } from 'src/common/adapters/tracker-id.interface';
-import { QueuePublisher } from 'src/common/adapters/queue/queue-publisher';
-import { Types } from 'mongoose';
+} from './../common/constants/provider';
+import { TrackerIdInterface } from './../common/adapters/tracker-id.interface';
+import { QueuePublisher } from './../common/adapters/queue/queue-publisher';
+import { FileRepositoryInterface } from './repositories/file-repository.interface';
+import { Mp3ConvertedRepositoryInterface } from './repositories/mp3-converted-repository.interface';
 
 @Injectable()
 export class ConverterService {
-  private fileModel: MongoGridFS;
-
   constructor(
     @Inject(NEW_FILE_CONVERTER_QUEUE_PUBLISHER_PROVIDER)
     private readonly convertMp4ToMp3Queue: QueuePublisher<NewFileConverterMessage>,
     @Inject(CONVERTION_SUCCESS_QUEUE_PUBLISHER_ADAPTER)
     private readonly convertionCompleteQueue: QueuePublisher<ConvertionSuccessMessage>,
-    @InjectConnection() private readonly connection: Connection,
-    @InjectModel(MP3_CONVERTER_SCHEMA)
-    private readonly mp3ConverterModel: Model<Mp3Converter>,
+    @Inject(FILE_REPOSITORY_PROVIDER)
+    private readonly fileRepository: FileRepositoryInterface,
+    @Inject(MP3_CONVERTER_REPOSITORY_PROVIDER)
+    private readonly mp3ConverterModel: Mp3ConvertedRepositoryInterface,
     @Inject(TRACKER_ID_PROVIDER) private readonly tracker: TrackerIdInterface,
     @Inject(LOGGER_PROVIDER) private readonly logger: LoggerInterface,
-  ) {
-    // @ts-ignore
-    this.fileModel = new MongoGridFS(this.connection.db, 'fs');
-  }
+  ) {}
 
   async readStream(id: string): Promise<GridFSBucketReadStream> {
-    return await this.fileModel.readFileStream(id);
+    return await this.fileRepository.readStream(id);
   }
 
   async findInfo(id: string): Promise<FileInfoDto> {
-    const results = await this.fileModel.find({
-      _id: new Types.ObjectId(id),
-    });
+    const result: IGridFSObject = await this.fileRepository.findById(id);
 
-    if (results.length === 0) {
+    if (!result) {
       throw new HttpException('File not found', 404);
     }
 
-    const result = results[0] || null;
     return {
       filename: result.filename,
       length: result.length,
@@ -70,11 +63,8 @@ export class ConverterService {
   }
 
   async getMp3ConvertedByUserId(userId: number): Promise<Mp3ConverterDto[]> {
-    const registers: Mp3ConverterDocument[] = await this.mp3ConverterModel
-      .find({
-        userId,
-      })
-      .exec();
+    const registers: Mp3ConverterDocument[] =
+      await this.mp3ConverterModel.findByUserId(userId.toString());
 
     return registers.map((item: Mp3ConverterDocument) => {
       const mp3ConvertedDto = new Mp3ConverterDto();
@@ -99,11 +89,7 @@ export class ConverterService {
       this.logger.info(`Deleting mp3 files converted after 30 days`, {
         trackId: trackId,
       });
-      await this.mp3ConverterModel.deleteMany({
-        createdAt: {
-          $lt: date.toISOString(),
-        },
-      });
+      await this.mp3ConverterModel.deleteManyLessThanDate(date);
       this.logger.info(`Deleted mp3 files converted after 30 days`, {
         trackId: trackId,
       });
@@ -115,7 +101,7 @@ export class ConverterService {
         },
       );
     } catch (error) {
-      this.logger.info(error, {
+      this.logger.error(error, {
         trackId: trackId,
       });
     }
@@ -123,7 +109,6 @@ export class ConverterService {
 
   async convertMp4ToMp3(message: NewFileConverterMessage) {
     try {
-      console.log(`id => ${message.id}`);
       await new Promise(async (resolve, reject) => {
         try {
           this.logger.info(`Checking if exists file ${message.id}`, {
@@ -199,13 +184,13 @@ export class ConverterService {
               filename: `${message.id}.mp3`,
               contentType: 'audio/mp3',
             };
-            const mp3Created = await this.fileModel.writeFileStream(
+            const mp3Created = await this.fileRepository.writeFileStream(
               readMp3Stream,
               options,
             );
             await this.mp3ConverterModel.insertMany([
               {
-                userId: message.user.id,
+                userId: message.user.id.toString(),
                 fileId: mp3Created._id,
                 createdAt: new Date(),
               },

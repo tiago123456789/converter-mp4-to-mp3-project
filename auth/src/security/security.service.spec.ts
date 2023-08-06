@@ -1,8 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { SecurityService } from './security.service';
 import { UserRepositoryInterface } from './repositories/user-respository.interface';
-import { BcryptAdapter } from 'src/common/adapters/bcrypt.adapter';
-import { JwtAdapter } from 'src/common/adapters/jwt.adapter';
 import { User } from './user.entity';
 import { EncrypterInterface } from 'src/common/adapters/encrypter.interface';
 import { TokenInterface } from 'src/common/adapters/token.interface';
@@ -11,6 +8,10 @@ describe('SecurityService', () => {
   let repository: jest.Mocked<UserRepositoryInterface<User>>;
   let encrypter: jest.Mocked<EncrypterInterface>;
   let authToken: jest.Mocked<TokenInterface>;
+  const user: User = new User();
+  user.email = 'fake@gmail.com';
+  user.password =
+    '$2a$08$Jn/Bwu38TST9uj/jehFUluEVXIz/KDmpe.nv2p0BYacwS5iPA8See';
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -86,11 +87,6 @@ describe('SecurityService', () => {
         authToken,
       );
 
-      const user: User = new User();
-      user.email = 'fake@gmail.com';
-      user.password =
-        '$2a$08$Jn/Bwu38TST9uj/jehFUluEVXIz/KDmpe.nv2p0BYacwS5iPA8See';
-
       repository.findByEmail.mockReturnValue(Promise.resolve(user));
       encrypter.compare.mockResolvedValue(Promise.resolve(false));
       await securityService.login({
@@ -109,11 +105,6 @@ describe('SecurityService', () => {
       encrypter,
       authToken,
     );
-
-    const user: User = new User();
-    user.email = 'fake@gmail.com';
-    user.password =
-      '$2a$08$Jn/Bwu38TST9uj/jehFUluEVXIz/KDmpe.nv2p0BYacwS5iPA8See';
 
     repository.findByEmail.mockReturnValue(Promise.resolve(user));
     encrypter.compare.mockResolvedValue(Promise.resolve(true));

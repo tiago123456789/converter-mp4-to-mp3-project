@@ -10,6 +10,8 @@ auth/node_modules/
 
 converter/.env
 converter/node_modules/
+converter/files-processing/*.mp4
+converter/files-processing/*.mp3
 
 notification/.env
 notification/node_modules/
