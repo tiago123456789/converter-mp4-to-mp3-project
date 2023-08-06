@@ -1,7 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MailInterface } from '../common/adapters/mail.interface';
-import { EMAIL_PROVIDER, LOGGER_PROVIDER } from 'src/common/constants/provider';
-import { ConvertionSuccessMessage } from 'src/common/queue/messages/convertion-success.message';
+import {
+  EMAIL_PROVIDER,
+  LOGGER_PROVIDER,
+} from './../common/constants/provider';
+import { ConvertionSuccessMessage } from './../common/queue/messages/convertion-success.message';
 
 @Injectable()
 export class NotificationService {
