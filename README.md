@@ -65,6 +65,9 @@ This project is a result the lecture https://www.youtube.com/watch?v=hmkF77F9TLw
 
 ## INSTRUCTIONS TO RUN LOCALLY
 
+### FOR ALL SERVICES
+- Import **insomnia.json** file in Insominia to test your application.
+
 #### AUTH SERVICE
 - Clone project
 - Access directory **auth**
