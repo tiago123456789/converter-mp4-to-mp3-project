@@ -2,15 +2,15 @@ version: "3"
 
 services:
 
-  # app:
-  #   restart: always
-  #   build:
-  #     context: .
-  #   ports:
-  #     - 3000:3000
-  #   container_name: api_auth_service_microservice
-  #   env_file:
-  #    - .env
+  app:
+    restart: always
+    build:
+      context: .
+    ports:
+      - 3000:3000
+    container_name: api_auth_service_microservice
+    env_file:
+     - .env
 
   database:
     image: postgres:14
