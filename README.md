@@ -11,6 +11,8 @@ This project is a result the lecture https://www.youtube.com/watch?v=hmkF77F9TLw
 
 ## TECHNOLOGIES
 
+#### EXTRA
+- Github actions(pipeline CI)
 
 #### AUTH SERVICE
 - Node.js
