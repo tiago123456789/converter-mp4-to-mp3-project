@@ -59,7 +59,7 @@ This project is a result the lecture https://www.youtube.com/watch?v=hmkF77F9TLw
 5º step - Check if access token is valid, if valid, forward requesto to converter service when make upload file to mongodb. and after send data to message queue.
 6º step - After 5º step send data to message queue.
 7º step - Notification service consume message of queue.
-8º step - Notify via email mp3 file converted success
+8º step - Notify via email mp3 file converted success. 
 
 
 
