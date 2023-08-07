@@ -81,3 +81,16 @@ This project is a result the lecture https://www.youtube.com/watch?v=hmkF77F9TLw
 - Execute command **npm i** to install packages
 - Execute all commands to run servies: **auth**, **converter** and **notification**.
 - Execute command **docker-compose up -d** the application run at http://localhost:3001
+
+## INSTRUCTIONS TO RUN PROJECT IN KUBERNTES WITH MINIKUBE
+
+- Install minikube.
+- Install nginx ingress in minikube.
+- Install kubectl(cli) to interact kubernetes.
+- Rename **infra/auth/secret.example.yml** to **infra/auth/secret.yml** and fill envs.
+- Rename **infra/converter/app-secret.example.yml** to **infra/converter/app-secret.yml** and fill envs.
+- Rename **infra/notification/secret.example.yml** to **infra/notification/secret.yml** and fill envs.
+- Execute command **kubectl apply -f infra/auth/ && kubectl apply -f infra/converter/ && kubectl apply -f infra/notification/ && kubectl apply -f infra/gateway/**
+- Execute command **minikube ip** to get minikube ip.
+- Add this line **ip_before_step_here   mp3converter.com** in file /etc/hosts
+- Execute command **minikube tunnel** and now you can access api using domain **mp3converter.com**
