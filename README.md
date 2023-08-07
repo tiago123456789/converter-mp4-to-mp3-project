@@ -52,14 +52,14 @@ This project is a result the lecture https://www.youtube.com/watch?v=hmkF77F9TLw
 ![Architecture the project](./architecture-converter-mp4-to-mp3-file.drawio.png)
 
 #### Explain the architecture flow
-1º step - Client application(app mobile, app web or cli) make request to application and Kubernetes receive via ingress.
-2º step - Ingress redirect to gateway service where gateway service is only point access and responsable to distribute request to another application.
-3º step - Send request to authenticate and check if token is valid.
-4º step - Make query in database.
-5º step - Check if access token is valid, if valid, forward requesto to converter service when make upload file to mongodb. and after send data to message queue.
-6º step - After 5º step send data to message queue.
-7º step - Notification service consume message of queue.
-8º step - Notify via email mp3 file converted success. 
+- 1º step - Client application(app mobile, app web or cli) make request to application and Kubernetes receive via ingress.
+- 2º step - Ingress redirect to gateway service where gateway service is only point access and responsable to distribute request to another application.
+- 3º step - Send request to authenticate and check if token is valid.
+- 4º step - Make query in database.
+- 5º step - Check if access token is valid, if valid, forward requesto to converter service when make upload file to mongodb. and after send data to message queue.
+- 6º step - After 5º step send data to message queue.
+- 7º step - Notification service consume message of queue.
+- 8º step - Notify via email mp3 file converted success. 
 
 
 
