@@ -63,8 +63,6 @@ This project is a result the lecture https://www.youtube.com/watch?v=hmkF77F9TLw
 - 7º step - Notification service consume message of queue.
 - 8º step - Notify via email mp3 file converted success. 
 
-
-
 ## INSTRUCTIONS TO RUN LOCALLY
 
 #### AUTH SERVICE
