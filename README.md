@@ -65,12 +65,16 @@ This project is a result the lecture https://www.youtube.com/watch?v=hmkF77F9TLw
 
 ## INSTRUCTIONS TO RUN LOCALLY
 
+### FOR ALL SERVICES
+- Import **insomnia.json** file in Insominia to test your application.
+
 #### AUTH SERVICE
 - Clone project
 - Access directory **auth**
 - Create **.env** file based **.env.example** file
 - Execute command **npm i** to install packages
 - Execute command **docker-compose up -d** the application is running at http://localhost:3000
+- Execute command **npm run typeorm:run-migrations** to execute migrations in auth database.
 
 #### CONVERTER SERVICE
 - Clone project
